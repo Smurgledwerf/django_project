@@ -9,9 +9,11 @@ class GameInLine(admin.TabularInline):
 
 
 class PlatformAdmin(admin.ModelAdmin):
-    fields = ['platform_name', 'release_date']
+    fields = ['platform_name', 'family', 'generation', 'release_date']
     inlines = [GameInLine]
-    list_display = ('platform_name', 'release_date')
+    list_display = ('platform_name', 'family', 'generation', 'release_date', 'is_current_generation')
+    list_editable = ['family', 'generation']
+    list_filter = ['family']
     search_fields = ['platform_name']
 
 

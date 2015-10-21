@@ -1,0 +1,9 @@
+<h1>{{ platform.platform_name }}</h1>
+
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<ul>
+{% for game in platform.game_set.all %}
+    <li>{{ game.game_name }}</li>
+{% endfor %}
+</ul>

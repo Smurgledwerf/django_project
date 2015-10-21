@@ -1,0 +1,13 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'inventory/style.css' %}" />
+
+{% if platform_list %}
+    <ul>
+        {% for platform in platform_list %}
+        <li><a href="{% url 'inventory:detail' platform.id %}">{{ platform.platform_name }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No platforms are available.</p>
+{% endif %}
