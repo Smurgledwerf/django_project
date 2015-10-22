@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 
 class Platform(models.Model):
@@ -12,6 +13,36 @@ class Platform(models.Model):
 
     def __str__(self):
         return self.platform_name
+
+    def clean(self):
+        """
+        Check some fields to make sure they are valid.
+        """
+        if self.generation < 1:
+            raise ValidationError("Generation must be greater than 0.")
+
+        for platform in Platform.objects.filter(family=self.family):
+            if platform == self:
+                continue
+            if platform.generation == self.generation:
+                raise ValidationError("Cannot have duplicate generations in family.")
+
+        super(Platform, self).clean()
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        """
+        Check some fields to make sure they are valid.
+        """
+        if self.generation < 1:
+            raise ValidationError("Generation must be greater than 0.")
+
+        for platform in Platform.objects.filter(family=self.family):
+            if platform == self:
+                continue
+            if platform.generation == self.generation:
+                raise ValidationError("Cannot have duplicate generations in family.")
+
+        super(Platform, self).save(force_insert, force_update, using, update_fields)
 
     def is_current_generation(self):
         """
@@ -37,3 +68,33 @@ class Game(models.Model):
 
     def __str__(self):
         return self.game_name
+
+    def clean(self):
+        """
+        Check some fields to make sure they are valid.
+        """
+        if self.hours_played < 0:
+            raise ValidationError("Hours played cannot be negative.")
+
+        zelda_oot = Game.objects.filter(game_name='The Legend of Zelda: Ocarina of Time')
+        if zelda_oot:
+            zelda_oot = zelda_oot[0]
+            if self != zelda_oot and self.hours_played > zelda_oot.hours_played:
+                raise ValidationError("Liar.")
+
+        super(Game, self).clean()
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        """
+        Check some fields to make sure they are valid.
+        """
+        if self.hours_played < 0:
+            raise ValidationError("Hours played cannot be negative.")
+
+        zelda_oot = Game.objects.filter(game_name='The Legend of Zelda: Ocarina of Time')
+        if zelda_oot:
+            zelda_oot = zelda_oot[0]
+            if self != zelda_oot and self.hours_played > zelda_oot.hours_played:
+                raise ValidationError("Liar.")
+
+        super(Game, self).save(force_insert, force_update, using, update_fields)
